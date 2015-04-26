@@ -23,7 +23,7 @@ We are making a few assumptions here:
 
 Further while running the tests we shall imagine the values to be unpaired. This makes sense because to be paired we would need to run 2 treatments on the same guinea-pig. That sounds absurd because once its teeth have grown, it would need to be brought back to the initial size, or it would just keep growing... neither of which sound practical.
 
-Lets start by looking at the nature of the data in general. Here we plot the growth by dose for a gievn mode of supplement. 
+Lets start by looking at the nature of the data in general. Here we plot the growth by dose for a given mode of supplement. 
 
 ```{r, echo=FALSE}
 coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
@@ -54,7 +54,18 @@ boxplot(len~dose*supp, data=ToothGrowth, notch=TRUE,
 
 From the plots its quite clear that increasing doses produce greater growth. Also, in general VC (ascorbic acid) seems a poorer supplement than OJ (orange juice), but for a dosage of 2mg they seem to have similar effects. Let us try to verify these insights through sounds statistics. 
 
-We define a couple of testing functions to do all our tests.
+Let us run the test for dose 2 mg vs 1 mg when the supplement is OJ. This can be done by the following commands.
+
+```{r}
+test.dt= mydt[supp == 'OJ' & dose != 0.5]
+test.dt= test.dt[, dose:= as.factor(dose)]
+result= t.test(len~I(relevel(dose,2)), paired=F, data= test.dt)
+result
+```
+
+The test result shows that the 95% confidence interval for the difference of means (dose 1 mg being reference) lies completely above 0. Alternatively, the t-statistic for the test is positive, and the p-value is less than the significance level of the test. Thus, dose of 2 mg produces statistically significant greater tooth growth than dose of 1 mg. 
+
+We would not like to do this repeatedly for all the different combinations of dose and supplement, so we need to automate the testing. We define a couple of testing functions to do all our tests. The conclusions will be printed based on the p-values and t-statistics.
 
 ```{r}
 performAllTests = function(mydt)
@@ -115,4 +126,4 @@ So now we run the battery of tests...
 performAllTests(mydt)
 ```
 
-As expected, the results show higher doses produce statistically significant better results that lower, and OJ shows better results than VC, expect for the dosage of 2 mg where the test fails to reject the null hypothesis. 
+As expected, the results show higher doses produce statistically significant better results that lower, and OJ shows better results than VC, except for the dosage of 2 mg where the test fails to reject the null hypothesis. 

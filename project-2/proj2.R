@@ -1,7 +1,6 @@
 # libraries ------------------------------
 library(data.table)
 library(datasets)
-library(ggplot2)
 
 # functions ------------------------------
 performAllTests = function(mydt)
